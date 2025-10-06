@@ -39,3 +39,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# deployment
+.vercel/*
+*.log
+.turbo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Prisma
+prisma/migrations/
+
+# Local environment
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
