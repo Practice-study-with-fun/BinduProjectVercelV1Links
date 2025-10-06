@@ -1,9 +1,12 @@
 'use client';
 
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState } from "react";
 import { ThemeToggle } from '../components/ThemeToggle';
 
 export default function Home() {
+  const [hover, setHover] = useState(false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header */}
@@ -35,7 +38,7 @@ export default function Home() {
             Manage Your Links
           </h2>
           <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            A modern, intuitive way to organize and preview your favorite websites. 
+            A modern, intuitive way to organize and preview your favorite websites.
             Create, manage, and browse your link collection with live iframe previews.
           </p>
         </div>
@@ -54,7 +57,7 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">View Links</h3>
               <p className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                Browse your link collection with beautiful cards and live iframe previews. 
+                Browse your link collection with beautiful cards and live iframe previews.
                 Click any link to see a real-time preview without leaving the page.
               </p>
               <div className="flex flex-wrap gap-2 mb-6">
@@ -85,7 +88,7 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Manage Links</h3>
               <p className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                Add, edit, and delete your links with a powerful management interface. 
+                Add, edit, and delete your links with a powerful management interface.
                 Real-time preview while you edit, with form validation and URL checking.
               </p>
               <div className="flex flex-wrap gap-2 mb-6">
@@ -142,13 +145,8 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-sm text-slate-600 dark:text-slate-400">
-            <p>Built with Next.js, React, and Tailwind CSS</p>
-          </div>
-        </div>
-      </div>
+      
+
     </div>
   );
 }
