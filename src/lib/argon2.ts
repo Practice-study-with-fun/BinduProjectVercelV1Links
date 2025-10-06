@@ -1,7 +1,6 @@
-// Password hashing utilities using better-auth's built-in functionality
-// This avoids the client-side bundling issues with @node-rs/argon2
+// Password hashing utilities using argon2
 
-import { hash, verify } from "better-auth";
+import * as argon2 from "argon2";
 
 const opts = {
   memoryCost: 19456,
@@ -11,13 +10,13 @@ const opts = {
 };
 
 export async function hashPassword(password: string) {
-  const result = await hash(password, opts);
+  const result = await argon2.hash(password, opts);
   return result;
 }
 
 export async function verifyPassword(data: { password: string; hash: string }) {
   const { password, hash } = data;
 
-  const result = await verify(hash, password, opts);
+  const result = await argon2.verify(hash, password);
   return result;
 }

@@ -7,11 +7,13 @@ import { signIn } from "@/lib/auth-client";
 interface SignInOauthButtonProps {
   provider: "google" | "github";
   signUp?: boolean;
+  className?: string;
 }
 
 export const SignInOauthButton = ({
   provider,
   signUp,
+  className,
 }: SignInOauthButtonProps) => {
   const [isPending, setIsPending] = useState(false);
 
@@ -31,7 +33,7 @@ export const SignInOauthButton = ({
   const providerName = provider === "google" ? "Google" : "GitHub";
 
   return (
-    <Button onClick={handleClick} disabled={isPending}>
+    <Button onClick={handleClick} disabled={isPending} className={className}>
       Sign {action} with {providerName}
     </Button>
   );

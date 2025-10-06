@@ -15,14 +15,14 @@ import {
 
 interface UpdateUserRoleButtonProps {
   userId: string;
-  currentRole: "USER" | "ADMIN" | "FIRSTC" | "SECONDC" | "THIRDC";
+  currentRole: "USER" | "ADMIN" | "FIRSTC" | "SECONDC";
 }
 
 export const UpdateUserRoleButton = ({ userId, currentRole }: UpdateUserRoleButtonProps) => {
   const [isPending, setIsPending] = useState(false);
   const [selectedRole, setSelectedRole] = useState(currentRole);
 
-  async function handleRoleChange(newRole: "USER" | "ADMIN" | "FIRSTC" | "SECONDC" | "THIRDC") {
+  async function handleRoleChange(newRole: "USER" | "ADMIN" | "FIRSTC" | "SECONDC") {
     if (newRole === currentRole) return;
 
     setIsPending(true);
@@ -52,7 +52,6 @@ export const UpdateUserRoleButton = ({ userId, currentRole }: UpdateUserRoleButt
         <SelectItem value="ADMIN">Admin</SelectItem>
         <SelectItem value="FIRSTC">FirstC</SelectItem>
         <SelectItem value="SECONDC">SecondC</SelectItem>
-        <SelectItem value="THIRDC">ThirdC</SelectItem>
       </SelectContent>
     </Select>
   );

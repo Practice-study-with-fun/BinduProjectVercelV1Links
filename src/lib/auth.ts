@@ -165,7 +165,13 @@ export const auth = betterAuth({
   ...options,
   plugins: [
     ...(options.plugins ?? []),
-    customSession(async ({ user, session }) => {
+customSession(async ({ user, session }) => {
+      // Fetch user with role from database
+      const fullUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: true },
+      });
+      
       return {
         session: {
           expiresAt: session.expiresAt,
@@ -178,7 +184,7 @@ export const auth = betterAuth({
           email: user.email,
           image: user.image,
           createdAt: user.createdAt,
-          role: user.role,
+          role: fullUser?.role || "USER",
           giraffeFact: "giraffes can sometimes nap with one eye open",
         },
       };

@@ -8,5 +8,3 @@ export { auth };
 // Re-export only the server-side functions
 export const getServerSession = auth.api.getSession;
 export const getServerUser = auth.api.getUser;
-export const requireAuth = auth.api.requireAuth;
-export const requireUser = auth.api.requireUser;

@@ -1,12 +1,9 @@
 'use client';
 
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
 import { ThemeToggle } from '../components/ThemeToggle';
 
 export default function Home() {
-  const [hover, setHover] = useState(false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header */}
