@@ -44,6 +44,7 @@ model User {
   sessions Session[]
   accounts Account[]
   posts    Post[]
+  links    Link[]
 
   @@map("users")
 }
@@ -96,4 +97,19 @@ model Verification {
   expiresAt  DateTime
 
   @@map("verifications")
+}
+
+model Link {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  title       String
+  url         String
+  description String?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("links")
 }

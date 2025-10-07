@@ -1,16 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useLinks } from '../../contexts/LinksContext';
 import { ThemeToggle } from '../../components/ThemeToggle';
+import { toast } from 'sonner';
+import { getLinksAction, type LinkData } from '../../actions/links.actions';
 
 export default function LinksPage() {
-  const { links } = useLinks();
+  const [links, setLinks] = useState<LinkData[]>([]);
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const [showIframe, setShowIframe] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   const selectedLinkData = selectedLink ? links.find(link => link.id === selectedLink) : null;
+
+  // Fetch links on component mount
+  useEffect(() => {
+    fetchLinks();
+  }, []);
+
+  const fetchLinks = async () => {
+    try {
+      setLoading(true);
+      const result = await getLinksAction();
+      if (result.success && result.links) {
+        setLinks(result.links);
+      } else {
+        toast.error(result.error || 'Failed to fetch links');
+      }
+    } catch {
+      toast.error('Failed to fetch links');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900/20 dark:to-indigo-900/20">
@@ -52,7 +75,13 @@ export default function LinksPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {links.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">Loading Links</h3>
+            <p className="text-slate-600 dark:text-slate-400">Please wait while we fetch your links...</p>
+          </div>
+        ) : links.length === 0 ? (
           <div className="text-center py-12">
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8 max-w-md mx-auto">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">

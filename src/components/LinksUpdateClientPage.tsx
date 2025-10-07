@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useLinks, type Link as LinkType } from '../contexts/LinksContext';
 import { ThemeToggle } from './ThemeToggle';
+import { toast } from 'sonner';
+import {
+  createLinkAction,
+  updateLinkAction,
+  deleteLinkAction,
+  getLinksAction,
+  type LinkData,
+} from '@/actions/links.actions';
 
 interface User {
   id: string;
@@ -17,7 +24,7 @@ interface LinksUpdateClientPageProps {
 }
 
 export default function LinksUpdateClientPage({ user }: LinksUpdateClientPageProps) {
-  const { links, addLink, updateLink, deleteLink } = useLinks();
+  const [links, setLinks] = useState<LinkData[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     url: '',
@@ -26,34 +33,86 @@ export default function LinksUpdateClientPage({ user }: LinksUpdateClientPagePro
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedLinkForPreview, setSelectedLinkForPreview] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch links on component mount
+  useEffect(() => {
+    fetchLinks();
+  }, []);
+
+  const fetchLinks = async () => {
+    try {
+      setLoading(true);
+      const result = await getLinksAction();
+      if (result.success && result.links) {
+        setLinks(result.links);
+      } else {
+        toast.error(result.error || 'Failed to fetch links');
+      }
+    } catch {
+      toast.error('Failed to fetch links');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.title || !formData.url) {
-      alert('Please fill in the required fields (Title and URL)');
+      toast.error('Please fill in the required fields (Title and URL)');
       return;
     }
 
     try {
       new URL(formData.url);
     } catch {
-      alert('Please enter a valid URL');
+      toast.error('Please enter a valid URL');
       return;
     }
 
-    if (editingId) {
-      updateLink(editingId, formData.title, formData.url, formData.description);
-      setEditingId(null);
-    } else {
-      addLink(formData.title, formData.url, formData.description);
+    setSubmitting(true);
+    
+    try {
+      let result;
+      if (editingId) {
+        result = await updateLinkAction({
+          id: editingId,
+          title: formData.title,
+          url: formData.url,
+          description: formData.description,
+        });
+        if (result.success) {
+          toast.success('Link updated successfully');
+          setEditingId(null);
+        }
+      } else {
+        result = await createLinkAction({
+          title: formData.title,
+          url: formData.url,
+          description: formData.description,
+        });
+        if (result.success) {
+          toast.success('Link created successfully');
+        }
+      }
+      
+      if (result.success) {
+        setFormData({ title: '', url: '', description: '' });
+        setShowForm(false);
+        await fetchLinks(); // Refresh the list
+      } else {
+        toast.error(result.error || 'Failed to save link');
+      }
+    } catch {
+      toast.error('Failed to save link');
+    } finally {
+      setSubmitting(false);
     }
-
-    setFormData({ title: '', url: '', description: '' });
-    setShowForm(false);
   };
 
-  const handleEdit = (link: LinkType) => {
+  const handleEdit = (link: LinkData) => {
     setFormData({
       title: link.title,
       url: link.url,
@@ -63,11 +122,21 @@ export default function LinksUpdateClientPage({ user }: LinksUpdateClientPagePro
     setShowForm(true);
   };
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      deleteLink(id);
-      if (selectedLinkForPreview === id) {
-        setSelectedLinkForPreview(null);
+      try {
+        const result = await deleteLinkAction(id);
+        if (result.success) {
+          toast.success('Link deleted successfully');
+          if (selectedLinkForPreview === id) {
+            setSelectedLinkForPreview(null);
+          }
+          await fetchLinks(); // Refresh the list
+        } else {
+          toast.error(result.error || 'Failed to delete link');
+        }
+      } catch {
+        toast.error('Failed to delete link');
       }
     }
   };
@@ -178,9 +247,17 @@ export default function LinksUpdateClientPage({ user }: LinksUpdateClientPagePro
                   <div className="flex space-x-3 pt-4">
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-200 font-medium"
+                      disabled={submitting}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {editingId ? 'Update Link' : 'Add Link'}
+                      {submitting ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>{editingId ? 'Updating...' : 'Adding...'}</span>
+                        </div>
+                      ) : (
+                        <span>{editingId ? 'Update Link' : 'Add Link'}</span>
+                      )}
                     </button>
                     <button
                       type="button"
@@ -208,7 +285,12 @@ export default function LinksUpdateClientPage({ user }: LinksUpdateClientPagePro
               </div>
               
               <div className="divide-y divide-slate-200 dark:divide-slate-700">
-                {links.length === 0 ? (
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-slate-500 dark:text-slate-400">Loading links...</p>
+                  </div>
+                ) : links.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

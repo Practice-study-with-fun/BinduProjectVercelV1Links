@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { LinksProvider } from '../contexts/LinksContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { Toaster } from 'sonner';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -11,9 +11,18 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider>
-      <LinksProvider>
-        {children}
-      </LinksProvider>
+      {children}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: 'var(--background)',
+            color: 'var(--foreground)',
+            border: '1px solid var(--border)',
+          },
+        }}
+      />
     </ThemeProvider>
   );
 }
