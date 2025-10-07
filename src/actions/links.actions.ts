@@ -371,3 +371,45 @@ export async function getAllLinksAdminAction(): Promise<{
     };
   }
 }
+
+// Get all links for public access (no authentication required)
+export async function getPublicLinksAction(): Promise<{
+  success: boolean;
+  links?: (LinkData & { userName: string })[];
+  error?: string;
+}> {
+  try {
+    const links = await prisma.link.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc", // Newest first as requested
+      },
+    });
+
+    return {
+      success: true,
+      links: links.map((link) => ({
+        id: link.id,
+        title: link.title,
+        url: link.url,
+        description: link.description,
+        createdAt: link.createdAt,
+        updatedAt: link.updatedAt,
+        userId: link.userId,
+        userName: link.user.name,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching public links:", error);
+    return {
+      success: false,
+      error: "Failed to fetch links",
+    };
+  }
+}

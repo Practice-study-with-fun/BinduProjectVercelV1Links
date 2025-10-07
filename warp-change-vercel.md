@@ -406,8 +406,43 @@ Schema: Links table created and migrated
 - ✅ Links persist after page reload
 - ✅ Links persist after server restart
 - ✅ Links persist across deployments
-- ✅ Each user sees only their own links
+- ✅ Each user sees only their own links in admin panel
 - ✅ Admin users have full access
+- ✅ **NEW**: Public users can view all links without authentication
+
+### **🌍 PUBLIC ACCESS UPDATE - October 7, 2025**
+
+**Major Enhancement**: The `/links` page is now publicly accessible!
+
+#### **🔓 What Changed**
+- **Public Link Viewing**: Any user (authenticated or not) can now access `/links`
+- **No Authentication Required**: Visitors don't need to login to browse links
+- **All Links Visible**: The page shows links from all users in the database
+- **Newest First**: Links are ordered by creation date (most recent first)
+- **Creator Attribution**: Each link shows the name of the user who created it
+
+#### **🎯 New Server Action**
+- **Added**: `getPublicLinksAction()` in `src/actions/links.actions.ts`
+- **Purpose**: Fetches all links from all users without authentication
+- **Ordering**: Returns links sorted by `createdAt DESC` (newest first)
+- **Data**: Includes link details plus creator's name
+
+#### **🎨 UI Updates**
+- **Public Branding**: Page titled "Public Links Collection"
+- **Creator Names**: Each link card shows "by [Username]"
+- **Admin Login Button**: Replaces "Manage Links" button for public users
+- **Updated Home Page**: Reflects new public access functionality
+
+#### **🔒 Access Control**
+- **🌍 Public**: `/links` - Anyone can view all links
+- **🔐 Admin Only**: `/links-update` - Requires admin authentication
+- **🏠 Home**: `/` - Public with updated messaging
+
+#### **🚀 User Experience**
+1. **Visitors**: Can browse all links without any registration
+2. **Community**: Discover links shared by all users
+3. **Admins**: Can login to manage and add new links
+4. **Real-time**: New links appear immediately for all users
 
 ---
 

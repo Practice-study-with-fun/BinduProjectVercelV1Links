@@ -4,10 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from '../../components/ThemeToggle';
 import { toast } from 'sonner';
-import { getLinksAction, type LinkData } from '../../actions/links.actions';
+import { getPublicLinksAction, type LinkData } from '../../actions/links.actions';
+
+// Extended type for public links with user name
+type PublicLinkData = LinkData & { userName: string };
 
 export default function LinksPage() {
-  const [links, setLinks] = useState<LinkData[]>([]);
+  const [links, setLinks] = useState<PublicLinkData[]>([]);
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const [showIframe, setShowIframe] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,7 @@ export default function LinksPage() {
   const fetchLinks = async () => {
     try {
       setLoading(true);
-      const result = await getLinksAction();
+      const result = await getPublicLinksAction();
       if (result.success && result.links) {
         setLinks(result.links);
       } else {
@@ -48,7 +51,7 @@ export default function LinksPage() {
                 </svg>
               </Link>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                Links Collection
+                Public Links Collection
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -64,10 +67,10 @@ export default function LinksPage() {
                 <span>{showIframe ? 'Hide' : 'Show'} Preview</span>
               </button>
               <Link
-                href="/links-update"
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                href="/auth/login"
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                Manage Links
+                Admin Login
               </Link>
             </div>
           </div>
@@ -89,13 +92,13 @@ export default function LinksPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">No Links Yet</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-6">Start building your link collection by adding some links.</p>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">No Links Available</h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6">No links have been shared publicly yet. Check back later!</p>
               <Link
-                href="/links-update"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+                href="/auth/login"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
               >
-                Add Your First Link
+                Admin Login to Add Links
               </Link>
             </div>
           </div>
@@ -137,6 +140,12 @@ export default function LinksPage() {
                               </svg>
                               Visit Link
                             </a>
+                            <span className="text-xs text-slate-400 dark:text-slate-500 flex items-center space-x-1">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                              <span>by {link.userName}</span>
+                            </span>
                             <span className="text-xs text-slate-400 dark:text-slate-500">
                               Added {link.createdAt.toLocaleDateString()}
                             </span>
